@@ -1,0 +1,33 @@
+name: Test specific version installation
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: '3.1.50'
+          no-cache: 'true'
+      - name: Assert emcc is available
+        run: |
+          echo "Checking emcc is on PATH..."
+          if ! command -v emcc &> /dev/null; then
+            echo "FAIL: emcc not found on PATH"
+            exit 1
+          fi
+          echo "emcc found at: $(which emcc)"
+          echo "PASS"
+      - name: Assert emcc version matches requested version
+        run: |
+          echo "Checking emcc version..."
+          VERSION_OUTPUT=$(emcc --version 2>&1)
+          echo "emcc version output: $VERSION_OUTPUT"
+          if echo "$VERSION_OUTPUT" | grep -q "3.1.50"; then
+            echo "PASS: emcc version 3.1.50 confirmed"
+          else
+            echo "FAIL: expected version 3.1.50 in output"
+            exit 1
+          fi
