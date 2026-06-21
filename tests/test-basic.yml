@@ -1,0 +1,39 @@
+name: Test basic usage - install latest emscripten
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: latest
+          no-cache: "true"
+      - name: Assert emcc is available
+        run: |
+          echo "Checking emcc availability..."
+          if ! command -v emcc &> /dev/null; then
+            echo "FAIL: emcc not found in PATH"
+            exit 1
+          fi
+          echo "emcc found at: $(which emcc)"
+          echo "PASS"
+      - name: Assert emcc version output
+        run: |
+          echo "Checking emcc version..."
+          emcc --version
+          if [ $? -ne 0 ]; then
+            echo "FAIL: emcc --version failed"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert EMSDK env var is set
+        run: |
+          echo "EMSDK=$EMSDK"
+          if [ -z "$EMSDK" ]; then
+            echo "FAIL: EMSDK environment variable is not set"
+            exit 1
+          fi
+          echo "PASS"
