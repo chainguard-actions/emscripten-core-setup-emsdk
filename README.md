@@ -11,6 +11,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | v12 | [`v12`](https://github.com/chainguard-actions/emscripten-core-setup-emsdk/tree/v12) | [`ab889da`](https://github.com/emscripten-core/setup-emsdk/commit/ab889da2abbcbb280f91ec4c215d3bb4f3a8f775) |
 | v13 | [`v13`](https://github.com/chainguard-actions/emscripten-core-setup-emsdk/tree/v13) | [`d233ac1`](https://github.com/emscripten-core/setup-emsdk/commit/d233ac12b0102f74ca199f5dad7a4e2c13a8a745) |
 | v14 | [`v14`](https://github.com/chainguard-actions/emscripten-core-setup-emsdk/tree/v14) | [`6ab9eb1`](https://github.com/emscripten-core/setup-emsdk/commit/6ab9eb1bda2574c4ddb79809fc9247783eaf9021) |
+| v15 | [`v15`](https://github.com/chainguard-actions/emscripten-core-setup-emsdk/tree/v15) | [`667eb33`](https://github.com/emscripten-core/setup-emsdk/commit/667eb33f24e84e7f362c16d8d7fff0629a73e15e) |
 
 ## Privacy
 
