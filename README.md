@@ -1,16 +1,96 @@
-# emscripten-core/setup-emsdk
+# setup-emsdk
 
-Download emsdk and optionally install a version of Emscripten
+This actions step downloads emsdk and installs a version of Emscripten.
 
-Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/emscripten-core/setup-emsdk](https://github.com/emscripten-core/setup-emsdk).
+## Usage
 
-## Versions
+```yaml
+name: "emsdk"
+on: [push]
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| v12 | [`v12`](https://github.com/chainguard-actions/emscripten-core-setup-emsdk/tree/v12) | [`ab889da`](https://github.com/emscripten-core/setup-emsdk/commit/ab889da2abbcbb280f91ec4c215d3bb4f3a8f775) |
-| v13 | [`v13`](https://github.com/chainguard-actions/emscripten-core-setup-emsdk/tree/v13) | [`d233ac1`](https://github.com/emscripten-core/setup-emsdk/commit/d233ac12b0102f74ca199f5dad7a4e2c13a8a745) |
-| v14 | [`v14`](https://github.com/chainguard-actions/emscripten-core-setup-emsdk/tree/v14) | [`6ab9eb1`](https://github.com/emscripten-core/setup-emsdk/commit/6ab9eb1bda2574c4ddb79809fc9247783eaf9021) |
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: emscripten-core/setup-emsdk@v15
+
+      - name: Verify
+        run: emcc -v
+```
+
+## Cache
+
+To just cache emsdk:
+
+```yaml
+- name: Setup emsdk
+  uses: emscripten-core/setup-emsdk@v15
+  with:
+    # Make sure to set a version number!
+    version: 5.0.1
+    # Optional emsdk version (set if not the same as emscripten version)
+    emsdk-version: 5.0.5
+    # This is the name of the cache folder.
+    # The cache folder will be placed in the build directory,
+    #  so make sure it doesn't conflict with anything!
+    actions-cache-folder: 'emsdk-cache'
+
+- name: Verify
+  run: emcc -v
+```
+
+If you want to also cache system libraries generated during build time:
+
+```yaml
+env:
+  EM_VERSION: 5.0.1
+  EM_CACHE_FOLDER: 'emsdk-cache'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup cache
+        id: cache-system-libraries
+        uses: actions/cache@v5
+        with:
+          path: ${{env.EM_CACHE_FOLDER}}
+          key: ${{env.EM_VERSION}}-${{ runner.os }}
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: ${{env.EM_VERSION}}
+          actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+      - name: Build library
+        run: make -j2
+      - name: Run unit tests
+        run: make check
+```
+
+## Options
+
+```yaml
+version:
+  description: 'Version to install'
+  default: 'latest'
+emsdk-version:
+  description: 'The version of emsdk that gets downloaded instead of making it the same as version'
+  default: ''
+no-install:
+  description: "If true will not download any version of Emscripten. emsdk will still be added to PATH."
+  default: false
+no-cache:
+  description: "If true will not cache any downloads with tc.cacheDir."
+  default: false
+actions-cache-folder:
+  description: "Directory to cache emsdk in. This folder will go under $GITHUB_HOME (I.e. build dir) and be cached using @actions/cache."
+  default: ''
+update:
+  description: "Fetch package information for all the new tools and SDK versions"
+  default: false
+```
+
+See [action.yml](action.yml)
 
 ## Privacy
 

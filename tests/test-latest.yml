@@ -1,0 +1,47 @@
+name: Test latest version - default behavior
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: "latest"
+          no-cache: true
+      - name: Assert emcc is available
+        run: |
+          echo "Checking emcc is on PATH..."
+          if ! command -v emcc &>/dev/null; then
+            echo "FAIL: emcc not found on PATH after installing latest"
+            exit 1
+          fi
+          echo "PASS: emcc found at $(command -v emcc)"
+      - name: Assert emcc runs successfully
+        run: |
+          echo "Running emcc --version..."
+          VERSION_OUTPUT=$(emcc --version 2>&1)
+          echo "emcc version output: $VERSION_OUTPUT"
+          if [ -z "$VERSION_OUTPUT" ]; then
+            echo "FAIL: emcc --version produced no output"
+            exit 1
+          fi
+          echo "PASS: emcc --version succeeded"
+      - name: Assert emsdk is on PATH
+        run: |
+          echo "Checking emsdk is on PATH..."
+          if ! command -v emsdk &>/dev/null; then
+            echo "FAIL: emsdk not found on PATH"
+            exit 1
+          fi
+          echo "PASS: emsdk found at $(command -v emsdk)"
+      - name: Assert EMSDK environment variable is set
+        run: |
+          echo "EMSDK env var: $EMSDK"
+          if [ -z "$EMSDK" ]; then
+            echo "FAIL: EMSDK environment variable is not set"
+            exit 1
+          fi
+          echo "PASS: EMSDK is set to $EMSDK"

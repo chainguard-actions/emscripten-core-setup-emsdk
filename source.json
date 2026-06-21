@@ -1,6 +1,11 @@
 {
   "owner": "emscripten-core",
   "repo": "setup-emsdk",
-  "version": "",
-  "url": "https://github.com/emscripten-core/setup-emsdk"
+  "version": "v16",
+  "commit_sha": "4528d102f7230f0e7b276855c01ea1159be0e984",
+  "url": "https://github.com/emscripten-core/setup-emsdk",
+  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
+  "test_agent_version": "1",
+  "harden_agent_version": "1"
 }
