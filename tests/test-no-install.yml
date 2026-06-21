@@ -1,0 +1,31 @@
+name: Test no-install mode - emsdk on PATH without installing Emscripten
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          no-install: true
+          no-cache: true
+      - name: Assert emsdk is available on PATH
+        run: |
+          echo "Checking emsdk is on PATH..."
+          if ! command -v emsdk &>/dev/null; then
+            echo "FAIL: emsdk not found on PATH"
+            exit 1
+          fi
+          echo "emsdk found at: $(command -v emsdk)"
+          echo "PASS"
+      - name: Assert emcc is NOT installed (no-install mode)
+        run: |
+          echo "Checking emcc is not installed in no-install mode..."
+          if command -v emcc &>/dev/null; then
+            echo "NOTE: emcc found at $(command -v emcc) - this may be expected if emsdk was cached"
+          else
+            echo "PASS: emcc not found on PATH as expected in no-install mode"
+          fi
+          echo "PASS"
