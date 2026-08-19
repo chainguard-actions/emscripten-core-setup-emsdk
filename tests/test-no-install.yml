@@ -9,22 +9,30 @@ jobs:
       - id: action
         uses: .
         with:
-          no-install: 'true'
-      - name: Assert emsdk is available on PATH
+          no-install: true
+          no-cache: true
+      - name: Assert emsdk is on PATH
         run: |
           echo "Checking emsdk is on PATH..."
-          if ! command -v emsdk &> /dev/null; then
+          if ! command -v emsdk >/dev/null 2>&1; then
             echo "FAIL: emsdk not found on PATH"
             exit 1
           fi
-          echo "emsdk found at: $(which emsdk)"
-          echo "PASS"
-      - name: Assert emcc is NOT available (no install)
+          echo "PASS: emsdk found at $(command -v emsdk)"
+      - name: Assert emsdk help works
         run: |
-          echo "Checking emcc is NOT on PATH (no-install mode)..."
-          if command -v emcc &> /dev/null; then
-            echo "WARN: emcc found on PATH in no-install mode (may be pre-installed)"
-            echo "emcc at: $(which emcc)"
+          echo "Running emsdk help..."
+          emsdk help
+          if [ $? -ne 0 ]; then
+            echo "FAIL: emsdk help returned non-zero exit code"
+            exit 1
+          fi
+          echo "PASS: emsdk help succeeded"
+      - name: Assert emcc is NOT installed (no-install mode)
+        run: |
+          echo "Checking emcc is NOT on PATH in no-install mode..."
+          if command -v emcc >/dev/null 2>&1; then
+            echo "NOTE: emcc found at $(command -v emcc) - this may be expected if a prior install exists"
           else
-            echo "PASS: emcc not on PATH as expected in no-install mode"
+            echo "PASS: emcc not found on PATH as expected in no-install mode"
           fi

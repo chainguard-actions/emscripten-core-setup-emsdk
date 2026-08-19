@@ -10,30 +10,29 @@ jobs:
         uses: .
         with:
           version: latest
-      - name: Assert emcc is available
+          no-cache: true
+      - name: Assert emcc is available on PATH
         run: |
           echo "Checking emcc is on PATH..."
-          if ! command -v emcc &> /dev/null; then
+          if ! command -v emcc >/dev/null 2>&1; then
             echo "FAIL: emcc not found on PATH"
             exit 1
           fi
-          echo "emcc found at: $(which emcc)"
-          echo "PASS"
-      - name: Assert emsdk is available
-        run: |
-          echo "Checking emsdk is on PATH..."
-          if ! command -v emsdk &> /dev/null; then
-            echo "FAIL: emsdk not found on PATH"
-            exit 1
-          fi
-          echo "emsdk found at: $(which emsdk)"
-          echo "PASS"
+          echo "PASS: emcc found at $(command -v emcc)"
       - name: Assert emcc version output
         run: |
-          echo "Checking emcc --version..."
+          echo "Running emcc --version..."
           emcc --version
           if [ $? -ne 0 ]; then
             echo "FAIL: emcc --version returned non-zero exit code"
             exit 1
           fi
-          echo "PASS"
+          echo "PASS: emcc --version succeeded"
+      - name: Assert emsdk is on PATH
+        run: |
+          echo "Checking emsdk is on PATH..."
+          if ! command -v emsdk >/dev/null 2>&1; then
+            echo "FAIL: emsdk not found on PATH"
+            exit 1
+          fi
+          echo "PASS: emsdk found at $(command -v emsdk)"
