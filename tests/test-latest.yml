@@ -1,4 +1,4 @@
-name: Test latest version - default behavior
+name: Test latest version installation
 on:
   workflow_dispatch:
 jobs:
@@ -14,34 +14,25 @@ jobs:
       - name: Assert emcc is available
         run: |
           echo "Checking emcc is on PATH..."
-          if ! command -v emcc &>/dev/null; then
-            echo "FAIL: emcc not found on PATH after installing latest"
-            exit 1
-          fi
-          echo "PASS: emcc found at $(command -v emcc)"
+          which emcc || { echo "FAIL: emcc not found on PATH"; exit 1; }
+          echo "PASS: emcc found at $(which emcc)"
       - name: Assert emcc runs successfully
         run: |
-          echo "Running emcc --version..."
           VERSION_OUTPUT=$(emcc --version 2>&1)
           echo "emcc version output: $VERSION_OUTPUT"
-          if [ -z "$VERSION_OUTPUT" ]; then
-            echo "FAIL: emcc --version produced no output"
+          if echo "$VERSION_OUTPUT" | grep -qi "emcc"; then
+            echo "PASS: emcc version output looks valid"
+          else
+            echo "FAIL: unexpected emcc version output"
             exit 1
           fi
-          echo "PASS: emcc --version succeeded"
       - name: Assert emsdk is on PATH
         run: |
           echo "Checking emsdk is on PATH..."
-          if ! command -v emsdk &>/dev/null; then
-            echo "FAIL: emsdk not found on PATH"
-            exit 1
-          fi
-          echo "PASS: emsdk found at $(command -v emsdk)"
-      - name: Assert EMSDK environment variable is set
+          which emsdk || { echo "FAIL: emsdk not found on PATH"; exit 1; }
+          echo "PASS: emsdk found at $(which emsdk)"
+      - name: Assert em++ is available
         run: |
-          echo "EMSDK env var: $EMSDK"
-          if [ -z "$EMSDK" ]; then
-            echo "FAIL: EMSDK environment variable is not set"
-            exit 1
-          fi
-          echo "PASS: EMSDK is set to $EMSDK"
+          echo "Checking em++ is on PATH..."
+          which em++ || { echo "FAIL: em++ not found on PATH"; exit 1; }
+          echo "PASS: em++ found at $(which em++)"
