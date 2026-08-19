@@ -1,4 +1,4 @@
-name: Test no-install mode - emsdk in PATH without installing emscripten
+name: Test no-install mode (emsdk on PATH only)
 on:
   workflow_dispatch:
 jobs:
@@ -9,30 +9,26 @@ jobs:
       - id: action
         uses: .
         with:
-          no-install: "true"
-          no-cache: "true"
-      - name: Assert emsdk is available in PATH
+          no-install: true
+          no-cache: true
+      - name: Assert emsdk is on PATH
         run: |
           echo "Checking emsdk availability..."
-          if ! command -v emsdk &> /dev/null; then
-            echo "FAIL: emsdk not found in PATH"
+          if ! command -v emsdk &>/dev/null; then
+            echo "FAIL: emsdk not found on PATH"
             exit 1
           fi
-          echo "emsdk found at: $(which emsdk)"
-          echo "PASS"
+          echo "PASS: emsdk found at $(command -v emsdk)"
       - name: Assert emcc is NOT installed
         run: |
           echo "Checking that emcc is not installed (no-install mode)..."
-          if command -v emcc &> /dev/null; then
-            echo "WARN: emcc found in PATH even in no-install mode (may be pre-installed)"
+          if command -v emcc &>/dev/null; then
+            echo "WARN: emcc found at $(command -v emcc) — may be a pre-existing install"
           else
-            echo "PASS: emcc not found in PATH as expected in no-install mode"
+            echo "PASS: emcc not found, as expected in no-install mode"
           fi
-      - name: Assert EMSDK env var is set
+      - name: Assert emsdk list works
         run: |
-          echo "EMSDK=$EMSDK"
-          if [ -z "$EMSDK" ]; then
-            echo "FAIL: EMSDK environment variable is not set"
-            exit 1
-          fi
-          echo "PASS"
+          echo "Running emsdk list..."
+          emsdk list
+          echo "PASS: emsdk list succeeded"

@@ -1,4 +1,4 @@
-name: Test basic Emscripten installation
+name: Test latest Emscripten installation
 on:
   workflow_dispatch:
 jobs:
@@ -9,7 +9,7 @@ jobs:
       - id: action
         uses: .
         with:
-          version: "3.1.64"
+          version: "latest"
           no-cache: true
       - name: Assert emcc is available
         run: |
@@ -19,15 +19,20 @@ jobs:
             exit 1
           fi
           echo "PASS: emcc found at $(command -v emcc)"
-      - name: Assert emcc version
+      - name: Assert emcc runs successfully
         run: |
+          echo "Running emcc --version..."
           VERSION_OUTPUT=$(emcc --version 2>&1)
           echo "emcc version output: $VERSION_OUTPUT"
-          if ! echo "$VERSION_OUTPUT" | grep -q "3.1.64"; then
-            echo "FAIL: expected version 3.1.64 in emcc output"
+          if [ -z "$VERSION_OUTPUT" ]; then
+            echo "FAIL: emcc --version produced no output"
             exit 1
           fi
-          echo "PASS: correct emcc version found"
+          if ! echo "$VERSION_OUTPUT" | grep -qi "emscripten"; then
+            echo "FAIL: emcc --version output does not mention Emscripten"
+            exit 1
+          fi
+          echo "PASS: emcc is working correctly"
       - name: Assert emsdk is on PATH
         run: |
           if ! command -v emsdk &>/dev/null; then
@@ -35,3 +40,10 @@ jobs:
             exit 1
           fi
           echo "PASS: emsdk found at $(command -v emsdk)"
+      - name: Assert em++ is available
+        run: |
+          if ! command -v em++ &>/dev/null; then
+            echo "FAIL: em++ not found on PATH"
+            exit 1
+          fi
+          echo "PASS: em++ found at $(command -v em++)"
