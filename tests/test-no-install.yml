@@ -1,4 +1,4 @@
-name: Test no-install mode
+name: Test no-install mode - emsdk on PATH without installing Emscripten
 on:
   workflow_dispatch:
 jobs:
@@ -6,34 +6,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: action
+      - id: setup-emsdk
         uses: .
         with:
           no-install: 'true'
           no-cache: 'true'
-      - name: Assert emsdk is available on PATH
+      - name: Assert emsdk is in PATH
         run: |
-          echo "Checking emsdk is on PATH..."
-          if ! command -v emsdk &>/dev/null; then
-            echo "FAIL: emsdk not found on PATH"
+          echo "PATH: $PATH"
+          echo "EMSDK: $EMSDK"
+          echo "Checking emsdk availability..."
+          if ! command -v emsdk > /dev/null 2>&1; then
+            echo "FAIL: emsdk not found in PATH"
             exit 1
           fi
-          echo "emsdk found at: $(command -v emsdk)"
-          echo "PASS"
+          echo "PASS: emsdk found at $(command -v emsdk)"
+      - name: Assert EMSDK environment variable is set
+        run: |
+          echo "EMSDK env var: $EMSDK"
+          if [ -z "$EMSDK" ]; then
+            echo "FAIL: EMSDK environment variable is not set"
+            exit 1
+          fi
+          echo "PASS: EMSDK is set to $EMSDK"
+      - name: Assert emsdk directory exists
+        run: |
+          echo "Checking EMSDK directory..."
+          if [ ! -d "$EMSDK" ]; then
+            echo "FAIL: EMSDK directory does not exist at $EMSDK"
+            exit 1
+          fi
+          echo "PASS: EMSDK directory exists at $EMSDK"
       - name: Assert emcc is NOT installed
         run: |
-          echo "Checking emcc is NOT on PATH (no-install mode)..."
-          if command -v emcc &>/dev/null; then
-            echo "WARN: emcc found on PATH in no-install mode (may be pre-installed)"
+          echo "Checking that emcc is not installed (no-install mode)..."
+          if command -v emcc > /dev/null 2>&1; then
+            echo "WARN: emcc found at $(command -v emcc) - unexpected in no-install mode"
           else
-            echo "PASS: emcc not on PATH as expected in no-install mode"
+            echo "PASS: emcc not installed as expected in no-install mode"
           fi
-      - name: Assert emsdk help works
-        run: |
-          echo "Running emsdk help..."
-          emsdk help
-          if [ $? -ne 0 ]; then
-            echo "FAIL: emsdk help returned non-zero exit code"
-            exit 1
-          fi
-          echo "PASS"

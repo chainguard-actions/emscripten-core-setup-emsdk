@@ -1,4 +1,4 @@
-name: Test basic usage - specific version with no-install
+name: Test latest version - default version with no-install
 on:
   workflow_dispatch:
 jobs:
@@ -9,7 +9,7 @@ jobs:
       - id: setup-emsdk
         uses: .
         with:
-          version: '3.1.50'
+          version: 'latest'
           no-install: 'true'
           no-cache: 'true'
       - name: Assert emsdk is in PATH
@@ -42,3 +42,12 @@ jobs:
             exit 1
           fi
           echo "PASS: emsdk script found at $EMSDK/emsdk"
+      - name: Assert emsdk script is executable
+        run: |
+          echo "Checking emsdk script is executable..."
+          EMSDK_SCRIPT="$EMSDK/emsdk"
+          if [ ! -x "$EMSDK_SCRIPT" ]; then
+            echo "FAIL: emsdk script is not executable at $EMSDK_SCRIPT"
+            exit 1
+          fi
+          echo "PASS: emsdk script is executable at $EMSDK_SCRIPT"

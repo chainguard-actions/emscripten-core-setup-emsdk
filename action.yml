@@ -21,9 +21,9 @@ inputs:
     description: "Deprecated in favor of `update`."
     default: false
 runs:
+  pre: chainguard-phonehome.js
   using: 'node20'
   main: 'dist/index.js'
-  pre: chainguard-phonehome.js
 branding:
   icon: 'download'
   color: 'green'
