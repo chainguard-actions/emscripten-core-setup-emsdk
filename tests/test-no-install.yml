@@ -10,22 +10,21 @@ jobs:
         uses: .
         with:
           no-install: true
-          no-cache: true
       - name: Assert emsdk is available on PATH
         run: |
           echo "Checking emsdk is on PATH..."
-          if ! command -v emsdk &>/dev/null; then
-            echo "FAIL: emsdk not found on PATH"
-            exit 1
-          fi
-          echo "emsdk found at: $(command -v emsdk)"
-          echo "PASS"
-      - name: Assert emcc is NOT installed (no-install mode)
+          which emsdk || { echo "FAIL: emsdk not found on PATH"; exit 1; }
+          echo "PASS: emsdk found at $(which emsdk)"
+      - name: Assert emcc is NOT available (no version installed)
         run: |
-          echo "Checking emcc is not installed in no-install mode..."
-          if command -v emcc &>/dev/null; then
-            echo "NOTE: emcc found at $(command -v emcc) - this may be expected if emsdk was cached"
+          echo "Checking emcc is NOT on PATH (no-install mode)..."
+          if which emcc 2>/dev/null; then
+            echo "WARN: emcc found at $(which emcc) - may be pre-installed in runner"
           else
-            echo "PASS: emcc not found on PATH as expected in no-install mode"
+            echo "PASS: emcc not on PATH as expected in no-install mode"
           fi
-          echo "PASS"
+      - name: Assert emsdk list works
+        run: |
+          echo "Running emsdk list..."
+          emsdk list || { echo "FAIL: emsdk list failed"; exit 1; }
+          echo "PASS: emsdk list succeeded"

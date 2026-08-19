@@ -1,4 +1,4 @@
-name: Test basic usage - install latest emsdk
+name: Test basic usage - install latest Emscripten
 on:
   workflow_dispatch:
 jobs:
@@ -10,31 +10,18 @@ jobs:
         uses: .
         with:
           version: latest
-          no-cache: true
-      - name: Assert emcc is available
+      - name: Assert emcc is available on PATH
         run: |
           echo "Checking emcc is on PATH..."
-          if ! command -v emcc &>/dev/null; then
-            echo "FAIL: emcc not found on PATH"
-            exit 1
-          fi
-          echo "emcc found at: $(command -v emcc)"
-          echo "PASS"
-      - name: Assert emsdk is available
-        run: |
-          echo "Checking emsdk is on PATH..."
-          if ! command -v emsdk &>/dev/null; then
-            echo "FAIL: emsdk not found on PATH"
-            exit 1
-          fi
-          echo "emsdk found at: $(command -v emsdk)"
-          echo "PASS"
+          which emcc || { echo "FAIL: emcc not found on PATH"; exit 1; }
+          echo "PASS: emcc found at $(which emcc)"
       - name: Assert emcc version output
         run: |
-          echo "Running emcc --version..."
-          emcc --version
-          if [ $? -ne 0 ]; then
-            echo "FAIL: emcc --version returned non-zero exit code"
-            exit 1
-          fi
-          echo "PASS"
+          echo "Checking emcc --version..."
+          emcc --version || { echo "FAIL: emcc --version failed"; exit 1; }
+          echo "PASS: emcc --version succeeded"
+      - name: Assert emsdk is available on PATH
+        run: |
+          echo "Checking emsdk is on PATH..."
+          which emsdk || { echo "FAIL: emsdk not found on PATH"; exit 1; }
+          echo "PASS: emsdk found at $(which emsdk)"
